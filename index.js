@@ -13,22 +13,41 @@ const d = 0; // distance (km)
 const fuel = 5000; // remaining fuel (kg)
 const fbr = 0.5; // fuel burn rate (kg/s)
 
+// Utility function to convert velocity from km/h to m/s
+const convertKmHtoMS = (kmh) => kmh * 1000 / 3600;
 
-const d2 = d + (vel*time) //calcultes new distance
-const rf = fbr*time //calculates remaining fuel
-const vel2 = calcNewVel(acc, vel, time) //calculates new velocity based on acceleration
+// Utility function to convert velocity from m/s to km/h
+const convertMStoKmH = (ms) => ms * 3600 / 1000;
 
-// Pick up an error with how the function below is called and make it robust to such errors
-calcNewVel = (vel, acc, time) => { 
-  return vel + (acc*time)
-}
+// Calculate new distance
+const distanceTraveledInKm = velocity * (timeInSeconds / 3600); // velocity in km/h to km traveled in time
+const newDistance = initialDistance + distanceTraveledInKm;
 
-console.log(`Corrected New Velocity: ${vel2} km/h`);
-console.log(`Corrected New Distance: ${d2} km`);
-console.log(`Corrected Remaining Fuel: ${rf} kg`);
+// Calculate remaining fuel
+const fuelUsed = fuelBurnRate * timeInSeconds;
+const newRemainingFuel = remainingFuel - fuelUsed;
 
+// Corrected `calcNewVel` function with input validation
+const calcNewVelocity = (initialVelocity, acceleration, time) => {
+  if (typeof initialVelocity !== 'number' || typeof acceleration !== 'number' || typeof time !== 'number') {
+    throw new Error("All parameters must be numbers.");
+  }
+  if (time < 0) {
+    throw new Error("Time cannot be negative.");
+  }
+  if (acceleration < 0) {
+    throw new Error("Acceleration cannot be negative.");
+  }
 
+  const initialVelocityInMS = convertKmHtoMS(initialVelocity);
+  const newVelocityInMS = initialVelocityInMS + (acceleration * time);
+  return convertMStoKmH(newVelocityInMS); // return result in km/h
+};
 
+// Calculate new velocity with the validated function
+const newVelocity = calcNewVelocity(velocity, acceleration, timeInSeconds);
 
-
-
+// Output Results
+console.log(`Corrected New Velocity: ${newVelocity.toFixed(2)} km/h`);
+console.log(`Corrected New Distance: ${newDistance.toFixed(2)} km`);
+console.log(`Corrected Remaining Fuel: ${newRemainingFuel.toFixed(2)} kg`);
